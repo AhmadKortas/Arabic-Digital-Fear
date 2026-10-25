@@ -1,11 +1,9 @@
-#!/usr/bin/env python3
 """
 RQ1 analysis: characterize Arabic cybersecurity discourse on Facebook.
 Computes content, engagement, temporal, and sentiment metrics for both
 datasets and saves publication-ready figures + a summary table.
 """
 import os
-import re
 import numpy as np
 import pandas as pd
 import matplotlib as mpl
@@ -42,7 +40,7 @@ def load(path, name):
     df["dataset"] = name
     return df
 
-# ---- Reaction-based sentiment (replicates dashboard logic) ----------------
+# ---- Reaction-based sentiment ----------------
 def sentiment(df):
     pos = df["Likes"].fillna(0) + 2*df["Love"].fillna(0) + 0.5*df["Care"].fillna(0)
     neg = 2*df["Angry"].fillna(0) + df["Sad"].fillna(0)
