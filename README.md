@@ -1,41 +1,52 @@
-# Digital Fear in Arabic Cybersecurity Discourse — Engagement & Agreement Analysis
+# Digital Fear in Arabic Cybersecurity Discourse — Analysis Code
 
-Analysis code for the RQ2 and RQ3 sections of our study of *digital fear* in
-Arabic cybersecurity discourse on Facebook. One script reproduces the fear-level
-statistics, the engagement analysis, and the annotator-agreement evaluation,
-along with the three figures used in the paper.
+Analysis code for our study of *digital fear* in Arabic cybersecurity discourse
+on Facebook. The scripts reproduce the descriptive and engagement results (RQ1),
+the fear-level and engagement analysis (RQ2), and the annotator-agreement
+evaluation (RQ3), along with the figures used in the paper.
 
-## What the script does
+## RQ1 — Characterizing the discourse (`rq1_analysis.py`)
 
-**RQ2 — prevalence and reception of digital fear**
-- Reports how the annotated sample splits across the three fear levels
-  (No Fear / Moderate Fear / High Fear).
-- Compares engagement (likes, comments, shares, total interactions) across
-  fear levels using medians and means, and tests the differences with a
-  Kruskal–Wallis test (suited to skewed count data).
-- Fits a negative binomial regression for shares and total interactions that
-  **controls for content type, page category, and page size (followers)**, so
-  the share effect isn't confused with format or reach. Results are reported as
-  incidence-rate ratios relative to No Fear.
+This script covers the whole RQ1 section. It loads the two datasets — the broad
+Arabic cybersecurity set (DS1) and the filtered cyber threat intelligence set
+(DS2) — and reports, for each one, the descriptive and engagement statistics that
+appear in the paper: number of posts, unique pages, date range, median message
+length, share of posts containing a URL, mean and median engagement (likes,
+comments, shares, total interactions), the content-type and page-category
+breakdowns, and reaction-based audience sentiment. It then writes six figures to
+a `figs/` folder:
 
-**RQ3 — reliability of FANAR as an annotator**
-- Compares FANAR's labels against a human annotator on the validation set.
-- Reports accuracy, Cohen's kappa (plain, linear-weighted, quadratic-weighted),
-  per-class precision/recall/F1, and the size of each disagreement.
-- Draws the confusion matrix.
+- temporal distribution of posts (2014–2024)
+- content-type distribution across the two datasets
+- average engagement by content type
+- reaction-based audience sentiment
+- posting activity by day of week
+- geographic distribution by administering country (top 10 per dataset)
 
-## Figures produced (saved to `./figs`)
-- `fig_fear_distribution.png` — fear-level split of the annotated sample
-- `fig_engagement_by_fear.png` — mean engagement by fear level
-- `fig_confusion_matrix.png` — FANAR vs. human labels
+Each figure is saved as both PDF (for the paper) and PNG.
+
+A small but important detail: CrowdTangle exports large counts with thousands
+separators (e.g. `49,695`). The loader strips these before converting to numeric,
+otherwise the most-viral posts turn into missing values and the engagement
+averages come out too low. This is why total interactions reconcile exactly with
+the paper's Table 3.
+
+## RQ2 and RQ3 — Fear prevalence, engagement, and annotator agreement
+
+`digital_fear_engagement_and_agreement.py` reproduces the fear-level
+distribution, the engagement-by-fear-level comparison with the Kruskal–Wallis
+test, the negative binomial model that adjusts for content type, page category
+and page size, and the FANAR-vs-human agreement metrics (accuracy, Cohen's kappa,
+per-class scores, confusion matrix). See the comments in that file for details.
 
 ## Data
 
-Two CSV files are expected (set the paths at the top of the script):
-- the FANAR-annotated sample — post text, `llm_label`, and CrowdTangle metadata
-  (`Total Interactions`, `Likes`, `Comments`, `Shares`, `Followers at Posting`,
-  `Type`, `Page Category`)
-- the human validation sample — `post_id`, `llm_label`, `Manual label`
+The scripts expect the dataset CSVs in the same folder (paths are set at the top
+of each script):
+
+- the broad Arabic cybersecurity dataset (DS1)
+- the filtered cyber threat intelligence dataset (DS2)
+- for RQ2/RQ3, the FANAR-annotated sample and the human validation sample
 
 The data are not included in this repository.
 
@@ -43,14 +54,8 @@ The data are not included in this repository.
 
 ```bash
 pip install pandas numpy scipy scikit-learn statsmodels matplotlib
+python rq1_analysis.py
 python digital_fear_engagement_and_agreement.py
 ```
 
-All results print to the console; the figures are written to `./figs`.
-
-## Note on CrowdTangle counts
-
-CrowdTangle exports large numbers with thousands separators (e.g. `49,695`).
-The script strips these before converting to numeric, so the most-engaged posts
-are not accidentally dropped — worth keeping in mind if you adapt the code for
-other CrowdTangle columns.
+All statistics print to the console; figures are written to `figs/`.
